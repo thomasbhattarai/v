@@ -1,0 +1,771 @@
+<?php
+    session_start();
+    require_once('connection.php');
+    
+    $error_message = '';
+    $success_message = '';
+    
+    if(isset($_POST['regs'])) {
+        $fname = mysqli_real_escape_string($con, $_POST['fname']);
+        $lname = mysqli_real_escape_string($con, $_POST['lname']);
+        $email = mysqli_real_escape_string($con, $_POST['email']);
+        $lic = mysqli_real_escape_string($con, $_POST['lic']);
+        $ph = mysqli_real_escape_string($con, $_POST['ph']);
+        $pass = mysqli_real_escape_string($con, $_POST['pass']);
+        $cpass = mysqli_real_escape_string($con, $_POST['cpass']);
+        $gender = mysqli_real_escape_string($con, $_POST['gender']);
+        $Pass = md5($pass);
+
+        if(empty($fname) || empty($lname) || empty($email) || empty($lic) || empty($ph) || empty($pass) || empty($gender)) {
+            $error_message = "Please fill all fields";
+        } else {
+            if($pass == $cpass) {
+                $sql2 = "SELECT * FROM users WHERE EMAIL='$email'";
+                $res = mysqli_query($con, $sql2);
+                if(mysqli_num_rows($res) > 0) {
+                    $error_message = "Email already exists. Please login instead!";
+                } else {
+                    $sql = "INSERT INTO users (FNAME, LNAME, EMAIL, LIC_NUM, PHONE_NUMBER, PASSWORD, GENDER) VALUES ('$fname', '$lname', '$email', '$lic', '$ph', '$Pass', '$gender')";
+                    $result = mysqli_query($con, $sql);
+                    if($result) {
+                        $success_message = "Registration successful! Redirecting to login...";
+                        echo '<script>
+                            setTimeout(function() {
+                                window.location.href = "index.php";
+                            }, 2000);
+                        </script>';
+                    } else {
+                        $error_message = "Please check the connection";
+                    }
+                }
+            } else {
+                $error_message = "Passwords do not match";
+            }
+        }
+    }
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - VeloRent</title>
+    
+    <!-- Embedded CSS -->
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c0c0c, #1a1a2e);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Main Wrapper */
+        .wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar Styles - Fixed at top */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            height: 80px;
+        }
+
+        .navbar img {
+            height: 50px;
+            transition: transform 0.3s;
+        }
+
+        .navbar img:hover {
+            transform: scale(1.05);
+        }
+
+        .menu ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .menu a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .menu a:not(.button)::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #ff7b00;
+            transition: width 0.3s;
+        }
+
+        .menu a:not(.button):hover {
+            color: #ff7b00;
+        }
+
+        .menu a:not(.button):hover::after {
+            width: 100%;
+        }
+
+        /* Cancel Button */
+        .cancel-btn {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            background: linear-gradient(45deg, #ff0000, #ff7b00);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(255, 123, 0, 0.3);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cancel-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 123, 0, 0.4);
+        }
+
+        /* Main Content */
+        .main {
+            padding: 120px 5% 40px;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 180px);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Register Container */
+        .register {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 600px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .register:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .register h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: #ff7b00;
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .register h2::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 4px;
+            background: #ff7b00;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        /* Form Styles */
+        #register {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #register label {
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #ddd;
+            font-size: 1rem;
+        }
+
+        #register input[type="text"],
+        #register input[type="email"],
+        #register input[type="tel"],
+        #register input[type="password"] {
+            width: 100%;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        #register input[type="text"]:focus,
+        #register input[type="email"]:focus,
+        #register input[type="tel"]:focus,
+        #register input[type="password"]:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #ff7b00;
+            box-shadow: 0 0 15px rgba(255, 123, 0, 0.3);
+        }
+
+        #register input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Gender Radio Buttons */
+        .gender-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 25px;
+            align-items: center;
+        }
+
+        .gender-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-weight: normal;
+            margin: 0;
+        }
+
+        .gender-group input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #ff7b00;
+        }
+
+        /* Error Message */
+        .error-message {
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff6b6b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            border-left: 4px solid #ff0000;
+            display: <?php echo !empty($error_message) ? 'block' : 'none'; ?>;
+        }
+
+        /* Success Message */
+        .success-message {
+            background: rgba(0, 255, 0, 0.1);
+            color: #6bff6b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            border-left: 4px solid #00ff00;
+            display: <?php echo !empty($success_message) ? 'block' : 'none'; ?>;
+        }
+
+        /* Submit Button */
+        .btnn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(45deg, #ff7b00, #ff5500);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .btnn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 123, 0, 0.4);
+            background: linear-gradient(45deg, #ff5500, #ff7b00);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(0, 0, 0, 0.95);
+            padding: 30px 5%;
+            text-align: center;
+            margin-top: auto;
+            width: 100%;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        footer p {
+            margin-bottom: 20px;
+            color: #aaa;
+        }
+
+        .socials {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .socials a {
+            color: #fff;
+            font-size: 1.5rem;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        .socials a:hover {
+            color: #ff7b00;
+            transform: translateY(-5px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .navbar {
+                padding: 15px 5%;
+            }
+
+            .menu ul {
+                gap: 20px;
+            }
+
+            .register {
+                padding: 40px;
+            }
+
+            .register h2 {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 5%;
+                height: 70px;
+            }
+            
+            .main {
+                padding: 100px 20px 40px;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .menu {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 250px;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.98);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                transition: right 0.5s ease;
+                z-index: 999;
+                box-shadow: -5px 0 20px rgba(0, 0, 0, 0.5);
+            }
+
+            .menu.active {
+                right: 0;
+            }
+
+            .menu ul {
+                flex-direction: column;
+                align-items: center;
+                gap: 30px;
+                width: 100%;
+                padding: 20px;
+            }
+
+            .menu a {
+                width: 100%;
+                text-align: center;
+                padding: 15px;
+                font-size: 1.1rem;
+            }
+
+            .cancel-btn {
+                top: 12px;
+                right: 12px;
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+
+            .register {
+                padding: 35px 30px;
+            }
+
+            .register h2 {
+                font-size: 1.6rem;
+            }
+
+            #register input[type="text"],
+            #register input[type="email"],
+            #register input[type="tel"],
+            #register input[type="password"] {
+                padding: 14px 18px;
+                font-size: 0.95rem;
+            }
+
+            .btnn {
+                padding: 14px;
+                font-size: 1rem;
+            }
+            
+            .gender-group {
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            footer {
+                padding: 25px 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar {
+                height: 65px;
+            }
+            
+            .main {
+                padding: 90px 15px 30px;
+            }
+            
+            .cancel-btn {
+                top: 12px;
+                right: 12px;
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+
+            .register {
+                padding: 30px 25px;
+            }
+
+            .register h2 {
+                font-size: 1.5rem;
+            }
+
+            #register input[type="text"],
+            #register input[type="email"],
+            #register input[type="tel"],
+            #register input[type="password"] {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+
+            .btnn {
+                padding: 12px;
+                font-size: 0.95rem;
+            }
+
+            footer {
+                padding: 20px 15px;
+            }
+            
+            .socials a {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 12px 4%;
+                height: 60px;
+            }
+            
+            .main {
+                padding: 80px 12px 25px;
+            }
+            
+            .cancel-btn {
+                top: 12px;
+                right: 12px;
+                padding: 7px 14px;
+                font-size: 0.8rem;
+            }
+
+            .register {
+                padding: 25px 20px;
+            }
+
+            .register h2 {
+                font-size: 1.4rem;
+                margin-bottom: 25px;
+            }
+
+            #register label {
+                font-size: 0.95rem;
+            }
+
+            #register input[type="text"],
+            #register input[type="email"],
+            #register input[type="tel"],
+            #register input[type="password"] {
+                padding: 11px 14px;
+                font-size: 0.85rem;
+                margin-bottom: 18px;
+            }
+
+            .btnn {
+                padding: 11px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+    
+
+        <!-- Cancel Button -->
+        <a href="index.php" class="cancel-btn">CANCEL</a>
+
+        <!-- Main Content -->
+        <div class="main">
+            <div class="register">
+                <h2>Register Here</h2>
+                
+                <!-- Error Message Display -->
+                <?php if(!empty($error_message)): ?>
+                    <div class="error-message">
+                        <?php echo htmlspecialchars($error_message); ?>
+                    </div>
+                <?php endif; ?>
+                
+                <!-- Success Message Display -->
+                <?php if(!empty($success_message)): ?>
+                    <div class="success-message">
+                        <?php echo htmlspecialchars($success_message); ?>
+                    </div>
+                <?php endif; ?>
+                
+                <form id="register" action="register.php" method="POST">    
+                    <label>First Name:</label>
+                    <input type="text" name="fname" placeholder="Enter Your First Name" required>
+
+                    <label>Last Name:</label>
+                    <input type="text" name="lname" placeholder="Enter Your Last Name" required>
+
+                    <label>Email:</label>
+                    <input type="email" name="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="ex: example@ex.com" placeholder="Enter Valid Email" required>
+
+                    <label>Your License Number:</label>
+                    <input type="text" name="lic" placeholder="Enter Your License Number" required>
+
+                    <label>Phone Number:</label>
+                    <input type="tel" name="ph" maxlength="10" onkeypress="return onlyNumberKey(event)" placeholder="Enter Your Phone Number" required>
+
+                    <label>Password:</label>
+                    <input type="password" name="pass" maxlength="12" id="psw" placeholder="Enter Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" required>
+
+                    <label>Confirm Password:</label>
+                    <input type="password" name="cpass" placeholder="Re-enter the password" required>
+
+                    <label>Gender:</label>
+                    <div class="gender-group">
+                        <input type="radio" id="male" name="gender" value="male" required>
+                        <label for="male">Male</label>
+                        <input type="radio" id="female" name="gender" value="female" required>
+                        <label for="female">Female</label>
+                    </div>
+
+                    <input type="submit" class="btnn" value="REGISTER" name="regs">
+                </form>
+            </div> 
+        </div>
+
+        <!-- Footer - Sticky at bottom -->
+        <footer>
+            <p>&copy; 2024 VeloRent. All Rights Reserved.</p>
+            <div class="socials">
+                <a href="https://www.facebook.com/thomasbhattrai"><ion-icon name="logo-facebook"></ion-icon></a>
+                <a href="https://x.com/thomashbhattarai"><ion-icon name="logo-twitter"></ion-icon></a>
+                <a href="https://www.instagram.com/swostimakaju/"><ion-icon name="logo-instagram"></ion-icon></a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/ionicons@5.4.0/dist/ionicons.js"></script>
+
+    <!-- Embedded JavaScript -->
+    <script>
+        // Hamburger menu toggle
+        const hamburger = document.getElementById('hamburger');
+        const menu = document.getElementById('menu');
+
+        if (hamburger && menu) {
+            hamburger.addEventListener('click', function() {
+                hamburger.classList.toggle('active');
+                menu.classList.toggle('active');
+                
+                // Prevent scrolling when menu is open
+                if(menu.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            // Close menu when clicking on a link
+            const menuLinks = document.querySelectorAll('.menu a');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    hamburger.classList.remove('active');
+                    menu.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!menu.contains(event.target) && !hamburger.contains(event.target)) {
+                    hamburger.classList.remove('active');
+                    menu.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        }
+
+        // Only number key for phone input
+        function onlyNumberKey(evt) {
+            var ASCIICode = (evt.which) ? evt.which : evt.keyCode;
+            if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57)) {
+                return false;
+            }
+            return true;
+        }
+
+        // Form validation
+        const form = document.getElementById('register');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                
+                // Get all required inputs
+                const inputs = form.querySelectorAll('input[required]');
+                inputs.forEach(input => {
+                    // Clear previous error styles
+                    input.style.borderColor = '';
+                    
+                    // Validate each field
+                    if (!input.value.trim()) {
+                        input.style.borderColor = '#ff0000';
+                        if (isValid) input.focus();
+                        isValid = false;
+                    }
+                    
+                    // Validate email pattern
+                    if (input.type === 'email' && !input.checkValidity()) {
+                        input.style.borderColor = '#ff0000';
+                        if (isValid) input.focus();
+                        isValid = false;
+                    }
+                });
+                
+                // Validate password match
+                const password = form.querySelector('input[name="pass"]');
+                const confirmPassword = form.querySelector('input[name="cpass"]');
+                if (password && confirmPassword && password.value !== confirmPassword.value) {
+                    password.style.borderColor = '#ff0000';
+                    confirmPassword.style.borderColor = '#ff0000';
+                    if (isValid) confirmPassword.focus();
+                    isValid = false;
+                }
+                
+                // Validate gender selection
+                const genderSelected = form.querySelector('input[name="gender"]:checked');
+                if (!genderSelected) {
+                    const genderGroup = form.querySelector('.gender-group');
+                    if (genderGroup) {
+                        genderGroup.style.outline = '2px solid #ff0000';
+                        genderGroup.style.borderRadius = '8px';
+                        genderGroup.style.padding = '5px';
+                    }
+                    isValid = false;
+                }
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Please fill in all required fields correctly.');
+                }
+            });
+        }
+
+        // Remove gender group outline when radio is clicked
+        const genderRadios = document.querySelectorAll('input[name="gender"]');
+        genderRadios.forEach(radio => {
+            radio.addEventListener('click', function() {
+                const genderGroup = document.querySelector('.gender-group');
+                if (genderGroup) {
+                    genderGroup.style.outline = '';
+                    genderGroup.style.padding = '';
+                }
+            });
+        });
+
+        // Simple page load animation
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease';
+            
+            setTimeout(function() {
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

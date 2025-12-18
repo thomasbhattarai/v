@@ -220,6 +220,84 @@
             }
         }
 
+        /* Login modal */
+        .login-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .login-modal {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 18px;
+            padding: 30px 26px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+            animation: popIn 0.35s ease;
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .login-modal h3 {
+            margin-bottom: 12px;
+            font-size: 1.6rem;
+            color: #ff7b00;
+        }
+
+        .login-modal p {
+            color: #ddd;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .modal-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(45deg, #ff7b00, #ff5500);
+            color: #fff;
+            box-shadow: 0 8px 18px rgba(255, 123, 0, 0.3);
+        }
+
+        .modal-btn.secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+        }
+
         .service-card:nth-child(2) {
             animation-delay: 0.2s;
         }
@@ -541,7 +619,6 @@
                         <li>24/7 Roadside assistance</li>
                         <li>Free delivery within city</li>
                     </ul>
-                    <a href="#" class="service-cta">Explore Cars</a>
                 </div>
 
                 <!-- Service Card 2 -->
@@ -556,7 +633,6 @@
                         <li>Easy pickup & drop-off</li>
                         <li>Maintenance included</li>
                     </ul>
-                    <a href="#" class="service-cta">View Bikes</a>
                 </div>
 
                 <!-- Service Card 3 -->
@@ -571,7 +647,6 @@
                         <li>Automatic transmission</li>
                         <li>Daily & weekly packages</li>
                     </ul>
-                    <a href="#" class="service-cta">See Scooters</a>
                 </div>
             </div>
 
@@ -597,6 +672,18 @@
                         <h4>Best Prices</h4>
                         <p>Competitive pricing with no hidden charges. We guarantee the best value for money.</p>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Required Modal -->
+        <div class="login-modal-overlay" id="login-modal">
+            <div class="login-modal">
+                <h3>Login Required</h3>
+                <p>You need to login first to explore vehicles.</p>
+                <div class="modal-actions">
+                    <button class="modal-btn primary" id="go-login">Go to Login</button>
+                    <button class="modal-btn secondary" id="close-modal">Close</button>
                 </div>
             </div>
         </div>
@@ -658,6 +745,7 @@
                 document.body.style.overflow = 'auto';
             }
         });
+
 
         // Add animation to service cards when they come into view
         const observerOptions = {

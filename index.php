@@ -9,7 +9,7 @@
 
         if(empty($email) || empty($pass))
         {
-            echo '<script>alert("Please fill the blanks")</script>';
+            echo '<script>showDialog("Please fill the blanks")</script>';
         }
         else{
             $query="SELECT * FROM users WHERE EMAIL='$email'";
@@ -38,7 +38,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VeloRent - Premium Vehicle Rental Service</title>
-    
+    <script src="main.js" defer></script>
     <!-- Embedded CSS -->
     <style>
         /* Reset and Base Styles */
@@ -546,6 +546,9 @@
                         <input type="password" name="pass" placeholder="Enter Password Here" required>
                         <input class="btnn" type="submit" value="Login" name="login">
                     </form>
+                    <p class="link" style="margin-top: 15px;">
+                        <a href="forgotpassword.php">Forgot Password?</a>
+                    </p>
                     <p class="link">Don't have an account?<br>
                         <a href="register.php">Sign up</a> here
                     </p>
@@ -641,7 +644,7 @@
             
             if (!isValid) {
                 e.preventDefault();
-                alert('Please enter valid email and password (minimum 6 characters).');
+                showDialog('Please enter valid email and password (minimum 6 characters).');
             }
         });
 

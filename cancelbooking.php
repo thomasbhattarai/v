@@ -10,15 +10,29 @@ if (!isset($_SESSION['email'])) {
 
 $email = $_SESSION['email'];
 
-// Update the most recent booking to Canceled
-$sql = "UPDATE booking SET BOOK_STATUS = 'Canceled' WHERE EMAIL = '$email' ORDER BY BOOK_ID DESC LIMIT 1";
-$result = mysqli_query($con, $sql);
-
-if ($result) {
-    echo '<script>alert("Booking canceled successfully")</script>';
-    echo '<script>window.location.href = "vehiclesdetails.php";</script>';
+// Check if booking ID is provided
+if (isset($_GET['id'])) {
+    $book_id = mysqli_real_escape_string($con, $_GET['id']);
+    
+    // Verify the booking belongs to the user before canceling
+    $verify_sql = "SELECT * FROM booking WHERE BOOK_ID = '$book_id' AND EMAIL = '$email'";
+    $verify_result = mysqli_query($con, $verify_sql);
+    
+    if (mysqli_num_rows($verify_result) > 0) {
+        // Update specific booking to Canceled
+        $sql = "UPDATE booking SET BOOK_STATUS = 'Canceled' WHERE BOOK_ID = '$book_id' AND EMAIL = '$email'";
+        $result = mysqli_query($con, $sql);
+        
+        if ($result) {
+            echo '<script src="main.js"></script>';
+            echo '<script>showDialog("Booking canceled successfully", function() { window.location.href = "bookingstatus.php"; });</script>';
+        } else {
+            echo '<script>showDialog("Error canceling booking. Please try again.", function() { window.location.href = "bookingstatus.php"; });</script>';
+        }
+    } else {
+        echo '<script>showDialog("Invalid booking or unauthorized access", function() { window.location.href = "bookingstatus.php"; });</script>';
+    }
 } else {
-    echo '<script>alert("Error canceling booking. Please try again.")</script>';
-    echo '<script>window.location.href = "bookingstatus.php";</script>';
+    echo '<script>showDialog("No booking ID provided", function() { window.location.href = "bookingstatus.php"; });</script>';
 }
 ?>

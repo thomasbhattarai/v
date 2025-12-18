@@ -300,6 +300,47 @@
             display: <?php echo !empty($error_message) ? 'block' : 'none'; ?>;
         }
 
+        /* Password Requirement Helper */
+        .password-helper {
+            background: rgba(33, 150, 243, 0.1);
+            border: 1px solid rgba(33, 150, 243, 0.25);
+            color: #64b5f6;
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            display: none;
+            font-size: 0.9rem;
+        }
+
+        .password-helper.show {
+            display: block;
+        }
+
+        .password-helper ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .password-helper li {
+            position: relative;
+            padding-left: 22px;
+            margin-bottom: 6px;
+        }
+
+        .password-helper li::before {
+            content: '✗';
+            position: absolute;
+            left: 0;
+            color: #ff6b6b;
+            font-weight: 700;
+        }
+
+        .password-helper li.valid::before {
+            content: '✓';
+            color: #4caf50;
+        }
+
         /* Success Message */
         .success-message {
             background: rgba(0, 255, 0, 0.1);
@@ -610,7 +651,15 @@
                     <input type="tel" name="ph" maxlength="10" onkeypress="return onlyNumberKey(event)" placeholder="Enter Your Phone Number" required>
 
                     <label>Password:</label>
-                    <input type="password" name="pass" maxlength="12" id="psw" placeholder="Enter Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" required>
+                    <div class="password-helper" id="password-helper">
+                        <ul>
+                            <li id="req-length">At least 8 characters</li>
+                            <li id="req-uppercase">At least 1 uppercase letter</li>
+                            <li id="req-number">At least 1 number</li>
+                            <li id="req-special">At least 1 special character (!@#$%^&*)</li>
+                        </ul>
+                    </div>
+                    <input type="password" name="pass" maxlength="20" id="psw" placeholder="Enter Password" pattern="(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}" title="Must contain at least one uppercase letter, one number, one special character, and be at least 8 characters long" required>
 
                     <label>Confirm Password:</label>
                     <input type="password" name="cpass" placeholder="Re-enter the password" required>
@@ -725,6 +774,13 @@
                     if (isValid) confirmPassword.focus();
                     isValid = false;
                 }
+
+                // Validate password requirements
+                if (password && !validatePassword(password.value)) {
+                    password.style.borderColor = '#ff0000';
+                    if (isValid) password.focus();
+                    isValid = false;
+                }
                 
                 // Validate gender selection
                 const genderSelected = form.querySelector('input[name="gender"]:checked');
@@ -740,8 +796,49 @@
                 
                 if (!isValid) {
                     e.preventDefault();
-                    alert('Please fill in all required fields correctly.');
                 }
+            });
+        }
+
+        // Password requirement checks
+        function validatePassword(password) {
+            const hasLength = password.length >= 8;
+            const hasUppercase = /[A-Z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+            const hasSpecial = /[!@#$%^&*]/.test(password);
+            return hasLength && hasUppercase && hasNumber && hasSpecial;
+        }
+
+        const passwordInput = document.getElementById('psw');
+        const helper = document.getElementById('password-helper');
+        const reqLength = document.getElementById('req-length');
+        const reqUppercase = document.getElementById('req-uppercase');
+        const reqNumber = document.getElementById('req-number');
+        const reqSpecial = document.getElementById('req-special');
+
+        if (passwordInput && helper) {
+            const updateRequirements = (val) => {
+                if (reqLength) {
+                    reqLength.classList.toggle('valid', val.length >= 8);
+                }
+                if (reqUppercase) {
+                    reqUppercase.classList.toggle('valid', /[A-Z]/.test(val));
+                }
+                if (reqNumber) {
+                    reqNumber.classList.toggle('valid', /[0-9]/.test(val));
+                }
+                if (reqSpecial) {
+                    reqSpecial.classList.toggle('valid', /[!@#$%^&*]/.test(val));
+                }
+            };
+
+            passwordInput.addEventListener('focus', () => {
+                helper.classList.add('show');
+                updateRequirements(passwordInput.value);
+            });
+
+            passwordInput.addEventListener('input', () => {
+                updateRequirements(passwordInput.value);
             });
         }
 

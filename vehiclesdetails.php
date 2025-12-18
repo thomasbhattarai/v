@@ -622,7 +622,7 @@ $recommendedIds = array_column(array_column($recommendedVehicles, 'vehicle'), 'V
         </div>
         <div class="menu">
             <ul>
-                <li><p class="phello"><a id="pname"><?php echo htmlspecialchars($rows['FNAME'].' '.$rows['LNAME']); ?></a></p></li>
+                <li><p class="phello"><a id="pname" href="userprofile.php" style="cursor: pointer;"><?php echo htmlspecialchars($rows['FNAME'].' '.$rows['LNAME']); ?></a></p></li>
                 <li><a id="stat" href="bookingstatus.php">BOOKING STATUS</a></li>
                 <li><button class="nn"><a href="index.php">LOGOUT</a></button></li>
             </ul>
@@ -679,8 +679,8 @@ $recommendedIds = array_column(array_column($recommendedVehicles, 'vehicle'), 'V
                             <h2>Capacity: <a><?php echo $vehicle['CAPACITY']?></a></h2>
                             <h2>Rent Per Day: <a>Rs<?php echo $vehicle['PRICE']?>/-</a></h2>
                             <h2>Vehicle Type: <a><?php echo $vehicle['VEHICLE_TYPE']?></a></h2>
-                            <button type="submit" name="booknow" class="utton">
-                                <a href="booking.php?id=<?php echo $res;?>">Book Now</a>
+                            <button onclick="window.location.href='booking.php?id=<?php echo $res;?>'" class="utton">
+                                Book Now
                             </button>
                         </div>
                     </div>
@@ -721,8 +721,8 @@ $recommendedIds = array_column(array_column($recommendedVehicles, 'vehicle'), 'V
                             <h2>Capacity: <a><?php echo $result['CAPACITY']?></a></h2>
                             <h2>Rent Per Day: <a>Rs<?php echo $result['PRICE']?>/-</a></h2>
                             <h2>Vehicle Type: <a><?php echo $result['VEHICLE_TYPE']?></a></h2>
-                            <button type="submit" name="booknow" class="utton">
-                                <a href="booking.php?id=<?php echo $res;?>">Book Now</a>
+                            <button onclick="window.location.href='booking.php?id=<?php echo $res;?>'" class="utton">
+                                Book Now
                             </button>
                         </div>
                     </div>

@@ -15,7 +15,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vehicle Management - VeloRent Admin</title>
-    
+    <script src="main.js" defer></script>
     <!-- Embedded CSS -->
     <style>
         /* Reset and Base Styles */
@@ -692,7 +692,7 @@
                         <td style="color: <?php echo $available_color; ?>; font-weight: 600;"><?php echo $available_text; ?></td>
                         <td>
                             <button class="button">
-                                <a href="deletevehicle.php?id=<?php echo urlencode($res['VEHICLE_ID']); ?>" onclick="return confirmDelete()">DELETE</a>
+                                <a href="#" onclick="confirmDelete(<?php echo urlencode($res['VEHICLE_ID']); ?>); return false;">DELETE</a>
                             </button>
                         </td>
                     </tr>
@@ -760,8 +760,11 @@
     }
 
     // Confirmation for delete actions
-    function confirmDelete() {
-        return confirm('Are you sure you want to delete this vehicle? This action cannot be undone.');
+    function confirmDelete(vehicleId) {
+        showDialog('Are you sure you want to delete this vehicle? This action cannot be undone.', function() {
+            window.location.href = 'deletevehicle.php?id=' + vehicleId;
+        }, true);
+        return false;
     }
 
     // Add hover effect to table rows

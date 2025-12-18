@@ -36,18 +36,16 @@ if (isset($_POST['addvehicle'])) {
             $res = mysqli_query($con, $query);
 
             if ($res) {
-                echo '<script>alert("New VEHICLE Added Successfully!!")</script>';
-                echo '<script>window.location.href = "adminvehicle.php";</script>';
+                echo '<script src="main.js"></script>';
+                echo '<script>showDialog("New VEHICLE Added Successfully!!", function() { window.location.href = "adminvehicle.php"; });</script>';
             } else {
-                echo '<script>alert("Database Error: ' . mysqli_error($con) . '")</script>';
+                echo '<script>showDialog("Database Error: ' . mysqli_error($con) . '");</script>';
             }
         } else {
-            echo '<script>alert("Invalid image format. Only JPG, JPEG, PNG, WEBP, and SVG are allowed.")</script>';
-            echo '<script>window.location.href = "addvehicle.php";</script>';
+            echo '<script>showDialog("Invalid image format. Only JPG, JPEG, PNG, WEBP, and SVG are allowed.", function() { window.location.href = "addvehicle.php"; });</script>';
         }
     } else {
-        echo '<script>alert("An unknown error occurred while uploading the image.")</script>';
-        echo '<script>window.location.href = "addvehicle.php";</script>';
+        echo '<script>showDialog("An unknown error occurred while uploading the image.", function() { window.location.href = "addvehicle.php"; });</script>';
     }
 } else {
     echo "false";

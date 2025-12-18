@@ -3,12 +3,11 @@ require_once('connection.php');
 session_start();
 $email = $_SESSION['email'];
 
-$sql = "SELECT * FROM booking WHERE EMAIL='$email' AND BOOK_STATUS != 'Canceled' ORDER BY BOOK_ID DESC LIMIT 1";
+$sql = "SELECT * FROM booking WHERE EMAIL='$email' AND BOOK_STATUS != 'Canceled' ORDER BY BOOK_ID DESC";
 $name = mysqli_query($con, $sql);
-$rows = mysqli_fetch_assoc($name);
 
-if ($rows == null) {
-    // Removed alert here
+if (mysqli_num_rows($name) == 0) {
+    // No bookings found
     ?>
     <button class="utton"><a href="vehiclesdetails.php">Go to Home</a></button>
     <div class="name">HELLO!</div>
@@ -23,25 +22,36 @@ if ($rows == null) {
     $sql2 = "SELECT * FROM users WHERE EMAIL='$email'";
     $name2 = mysqli_query($con, $sql2);
     $rows2 = mysqli_fetch_assoc($name2);
-
-    $vehicle_id = $rows['VEHICLE_ID'];
-    $sql3 = "SELECT * FROM vehicles WHERE VEHICLE_ID='$vehicle_id'";
-    $name3 = mysqli_query($con, $sql3);
-    $rows3 = mysqli_fetch_assoc($name3);
 ?>
 
 <button class="utton"><a href="vehiclesdetails.php">Go to Home</a></button>
 <div class="name">HELLO!</div>
-<button class="cancel-btn"><a href="cancelbooking.php">Cancel Booking</a></button>
+
+<?php
+    // Loop through all bookings
+    while($rows = mysqli_fetch_assoc($name)) {
+        $vehicle_id = $rows['VEHICLE_ID'];
+        $book_id = $rows['BOOK_ID'];
+        $sql3 = "SELECT * FROM vehicles WHERE VEHICLE_ID='$vehicle_id'";
+        $name3 = mysqli_query($con, $sql3);
+        $rows3 = mysqli_fetch_assoc($name3);
+?>
+
 <div class="box">
     <div class="content">
         <h1>VEHICLE NAME: <?php echo htmlspecialchars($rows3['VEHICLE_NAME']); ?></h1><br>
         <h1>NO OF DAYS: <?php echo $rows['DURATION']; ?></h1><br>
         <h1>BOOKING STATUS: <?php echo $rows['BOOK_STATUS']; ?></h1><br>
+        <div class="button-container">
+            <a href="cancelbooking.php?id=<?php echo $book_id; ?>" class="cancel-booking-btn" onclick="return confirm('Are you sure you want to cancel this booking?');">Cancel This Booking</a>
+        </div>
     </div>
 </div>
 
-<?php } ?>
+<?php 
+    } // End while loop
+} // End else
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -187,6 +197,38 @@ if ($rows == null) {
             padding: 20px;
             text-align: center;
             font-weight: 500;
+        }
+
+        /* Button Container */
+        .button-container {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Individual Cancel Booking Button */
+        .cancel-booking-btn {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff4444, #cc0000);
+            color: white;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 50px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 68, 68, 0.3);
+        }
+
+        .cancel-booking-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 68, 68, 0.5);
+            background: linear-gradient(45deg, #ff5555, #dd0000);
+        }
+
+        .cancel-booking-btn:active {
+            transform: translateY(-1px);
         }
 
         /* Status Color Coding */

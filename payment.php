@@ -35,7 +35,7 @@ if(isset($_POST['pay'])){
     $cvv = mysqli_real_escape_string($con, $_POST['cvv']);
     $price = $email['PRICE'];
     if(empty($cardno) || empty($exp) || empty($cvv) ){
-        echo '<script>alert("Please fill all fields")</script>';
+        echo '<script>showDialog("Please fill all fields")</script>';
     }
     else{
         $sql2 = "INSERT INTO payment (BOOK_ID, CARD_NO, EXP_DATE, CVV, PRICE) VALUES ($bid, '$cardno', '$exp', $cvv, $price)";

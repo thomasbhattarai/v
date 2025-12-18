@@ -15,7 +15,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Vehicle - VeloRent Admin</title>
-    
+    <script src="main.js" defer></script>
     <!-- Embedded CSS -->
     <style>
         /* Reset and Base Styles */
@@ -683,7 +683,7 @@
                 
                 if (!isValid) {
                     e.preventDefault();
-                    alert('Please fill in all required fields with valid values.');
+                    showDialog('Please fill in all required fields with valid values.');
                 }
             });
         }

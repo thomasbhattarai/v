@@ -15,7 +15,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking Management - VeloRent Admin</title>
-    
+    <script src="main.js" defer></script>
     <!-- Embedded CSS -->
     <style>
         /* Reset and Base Styles */
@@ -301,6 +301,17 @@
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0, 136, 255, 0.4);
             background: linear-gradient(45deg, #0066cc, #0088ff);
+        }
+
+        .content-table .cancel-btn {
+            background: linear-gradient(45deg, #ff4444, #cc0000);
+            color: white;
+        }
+
+        .content-table .cancel-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 68, 68, 0.5);
+            background: linear-gradient(45deg, #cc0000, #ff4444);
         }
 
         /* Admin Stats */
@@ -660,7 +671,8 @@
             <table class="content-table">
                 <thead>
                     <tr>
-                        <th>VEHICLE ID</th>
+                        <th>USER NAME</th>
+                        <th>VEHICLE NAME</th>
                         <th>EMAIL</th>
                         <th>BOOK PLACE</th>
                         <th>BOOK DATE</th>
@@ -671,12 +683,17 @@
                         <th>STATUS</th>
                         <th>APPROVE</th>
                         <th>RETURNED</th>
+                        <th>CANCEL</th>
                     </tr>
                 </thead>
                 <tbody>
                 <?php
                     require_once('connection.php');
-                    $query = "SELECT * FROM booking ORDER BY BOOK_ID DESC";
+                    $query = "SELECT b.*, v.VEHICLE_NAME, u.FNAME, u.LNAME 
+                              FROM booking b 
+                              LEFT JOIN vehicles v ON b.VEHICLE_ID = v.VEHICLE_ID 
+                              LEFT JOIN users u ON b.EMAIL = u.EMAIL 
+                              ORDER BY b.BOOK_ID DESC";
                     $queryy = mysqli_query($con, $query);
                     if($queryy) {
                         while ($res = mysqli_fetch_array($queryy)) {
@@ -684,9 +701,19 @@
                             $status_color = $isApproved ? '#00ff00' : '#ffff00';
                             $status_bg = $isApproved ? 'rgba(0, 255, 0, 0.1)' : 'rgba(255, 255, 0, 0.1)';
                             $status_border = $isApproved ? 'rgba(0, 255, 0, 0.3)' : 'rgba(255, 255, 0, 0.3)';
+                            
+                            // Construct full name
+                            $fullName = trim($res['FNAME'] . ' ' . $res['LNAME']);
+                            if(empty($fullName)) {
+                                $fullName = 'N/A';
+                            }
+                            
+                            // Get vehicle name
+                            $vehicleName = !empty($res['VEHICLE_NAME']) ? $res['VEHICLE_NAME'] : 'N/A';
                 ?>
                     <tr id="row-<?php echo $res['BOOK_ID']; ?>">
-                        <td><?php echo htmlspecialchars($res['VEHICLE_ID']); ?></td>
+                        <td><?php echo htmlspecialchars($fullName); ?></td>
+                        <td><?php echo htmlspecialchars($vehicleName); ?></td>
                         <td><?php echo htmlspecialchars($res['EMAIL']); ?></td>
                         <td><?php echo htmlspecialchars($res['BOOK_PLACE']); ?></td>
                         <td><?php echo htmlspecialchars($res['BOOK_DATE']); ?></td>
@@ -712,11 +739,18 @@
                                 RETURNED
                             </a>
                         </td>
+                        <td>
+                            <a href="admincancelbooking.php?id=<?php echo urlencode($res['BOOK_ID']); ?>" 
+                               class="button cancel-btn" 
+                               onclick="return confirm('Are you sure you want to cancel this booking?')">
+                                CANCEL
+                            </a>
+                        </td>
                     </tr>
                 <?php 
                         }
                     } else {
-                        echo '<tr><td colspan="11" style="text-align: center; color: #ff6b6b;">Error loading booking data</td></tr>';
+                        echo '<tr><td colspan="13" style="text-align: center; color: #ff6b6b;">Error loading booking data</td></tr>';
                     }
                 ?>
                 </tbody>
@@ -796,14 +830,13 @@
                     row.querySelector('td:nth-child(9)').style.color = '#00ff00';
                     row.querySelector('td:nth-child(9)').style.background = 'rgba(0, 255, 0, 0.1)';
                     row.querySelector('td:nth-child(9)').style.border = '1px solid rgba(0, 255, 0, 0.3)';
-                    alert('Booking approved successfully!');
+                    showDialog('Booking approved successfully!');
                 } else {
-                    alert('Error: ' + (data.error || 'Failed to approve booking'));
+                    showDialog('Error: ' + (data.error || 'Failed to approve booking'));
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('Network error. Please try again.');
+                showDialog('Network error. Please try again.');
             });
         
         return false;
@@ -824,14 +857,13 @@
                 if (data.success) {
                     const row = button.closest('tr');
                     row.remove();
-                    alert('Vehicle marked as returned!');
+                    showDialog('Vehicle marked as returned!');
                 } else {
-                    alert('Error: ' + (data.error || 'Failed to mark as returned'));
+                    showDialog('Error: ' + (data.error || 'Failed to mark as returned'));
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('Network error. Please try again.');
+                showDialog('Network error. Please try again.');
             });
         
         return false;

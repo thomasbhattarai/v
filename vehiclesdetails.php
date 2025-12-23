@@ -324,6 +324,7 @@ ob_start();
 
         .utton {
             margin-top: 20px;
+            display: inline-block;
             background: linear-gradient(45deg, #ff7b00, #ff5500);
             border: none;
             padding: 14px 30px;
@@ -331,12 +332,10 @@ ob_start();
             cursor: pointer;
             font-size: 1.1rem;
             font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .utton a {
             color: #fff;
             text-decoration: none;
+            transition: all 0.3s;
+            text-align: center;
         }
 
         .utton:hover {
@@ -679,9 +678,7 @@ $recommendedIds = array_column(array_column($recommendedVehicles, 'vehicle'), 'V
                             <h2>Capacity: <a><?php echo $vehicle['CAPACITY']?></a></h2>
                             <h2>Rent Per Day: <a>Rs<?php echo $vehicle['PRICE']?>/-</a></h2>
                             <h2>Vehicle Type: <a><?php echo $vehicle['VEHICLE_TYPE']?></a></h2>
-                            <button onclick="window.location.href='booking.php?id=<?php echo $res;?>'" class="utton">
-                                Book Now
-                            </button>
+                            <a class="utton" href="booking.php?id=<?php echo $res;?>">Book Now</a>
                         </div>
                     </div>
                 </form>
@@ -721,9 +718,7 @@ $recommendedIds = array_column(array_column($recommendedVehicles, 'vehicle'), 'V
                             <h2>Capacity: <a><?php echo $result['CAPACITY']?></a></h2>
                             <h2>Rent Per Day: <a>Rs<?php echo $result['PRICE']?>/-</a></h2>
                             <h2>Vehicle Type: <a><?php echo $result['VEHICLE_TYPE']?></a></h2>
-                            <button onclick="window.location.href='booking.php?id=<?php echo $res;?>'" class="utton">
-                                Book Now
-                            </button>
+                            <a class="utton" href="booking.php?id=<?php echo $res;?>">Book Now</a>
                         </div>
                     </div>
                 </form>
